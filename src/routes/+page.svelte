@@ -1,8 +1,8 @@
 <script>
   import Keyboard from "$lib/Keyboard.svelte";
 
-  let keys = [];
-  const keyClass = {};
+  let keys = $state([]);
+  let keyClass = $state({});
 </script>
 
 <h1>svelte-keyboard</h1>
@@ -17,7 +17,7 @@
   <p>key pressed: <strong>{keys[0] || ""}</strong></p>
 </div>
 <div>
-  <Keyboard on:keydown="{({ detail }) => (keys[0] = detail)}" />
+  <Keyboard onkeydown={(key) => (keys[0] = key)} />
 </div>
 
 <div class="info">
@@ -27,7 +27,7 @@
 <div>
   <Keyboard
     localizationLayout="azerty"
-    on:keydown="{({ detail }) => (keys[1] = detail)}"
+    onkeydown={(key) => (keys[1] = key)}
   />
 </div>
 
@@ -38,7 +38,7 @@
 <div>
   <Keyboard
     layout="wordle"
-    on:keydown="{({ detail }) => (keys[2] = detail)}"
+    onkeydown={(key) => (keys[2] = key)}
     --text-transform="uppercase"
   />
 </div>
@@ -51,7 +51,7 @@
   <Keyboard
     layout="wordle"
     localizationLayout="azerty"
-    on:keydown="{({ detail }) => (keys[3] = detail)}"
+    onkeydown={(key) => (keys[3] = key)}
     --text-transform="uppercase"
   />
 </div>
@@ -63,7 +63,7 @@
 <div>
   <Keyboard
     layout="crossword"
-    on:keydown="{({ detail }) => (keys[4] = detail)}"
+    onkeydown={(key) => (keys[4] = key)}
     --text-transform="uppercase"
   />
 </div>
@@ -76,7 +76,7 @@
   <Keyboard
     layout="crossword"
     localizationLayout="azerty"
-    on:keydown="{({ detail }) => (keys[5] = detail)}"
+    onkeydown={(key) => (keys[5] = key)}
     --text-transform="uppercase"
   />
 </div>
@@ -88,7 +88,7 @@
 <div>
   <Keyboard
     --flex="0 auto"
-    custom="{[
+    custom={[
       { row: 0, value: 's' },
       { row: 0, value: 'v' },
       { row: 0, value: 'e' },
@@ -103,8 +103,8 @@
       { row: 1, value: 'a' },
       { row: 1, value: 'r' },
       { row: 1, value: 'd' },
-    ]}"
-    on:keydown="{({ detail }) => (keys[6] = detail)}"
+    ]}
+    onkeydown={(key) => (keys[6] = key)}
   />
 </div>
 
@@ -122,7 +122,7 @@
     --stroke-width="2px"
     --active-background="lightgreen"
     --active-color="black"
-    on:keydown="{({ detail }) => (keys[7] = detail)}"
+    onkeydown={(key) => (keys[7] = key)}
   />
 </div>
 
@@ -140,7 +140,7 @@
     --active-color="darkred"
     --active-transform="translate(2px, 2px)"
     --font-size="18px"
-    on:keydown="{({ detail }) => (keys[8] = detail)}"
+    onkeydown={(key) => (keys[8] = key)}
   />
 </div>
 
@@ -150,11 +150,11 @@
 </div>
 <div>
   <Keyboard
-    keyClass="{keyClass}"
-    on:keydown="{({ detail }) => {
-      keys[9] = detail;
-      keyClass[detail] = 'clicked';
-    }}"
+    {keyClass}
+    onkeydown={(key) => {
+      keys[9] = key;
+      keyClass[key] = 'clicked';
+    }}
   />
 </div>
 
