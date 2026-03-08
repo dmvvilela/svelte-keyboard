@@ -1,6 +1,4 @@
 <script>
-  import { createEventDispatcher } from "svelte";
-
   import qwertyStandard from "$lib/layouts/qwerty/standard.js";
   import qwertyCrossword from "$lib/layouts/qwerty/crossword.js";
   import qwertyWordle from "$lib/layouts/qwerty/wordle.js";
@@ -12,17 +10,20 @@
   import backspaceSVG from "$lib/svg/backspace.js";
   import enterSVG from "$lib/svg/enter.js";
 
-  // exposed props
-  export let custom;
-  export let localizationLayout = "qwerty";
-  export let layout = "standard";
-  export let noSwap = [];
-  export let keyClass = {};
+  // props
+  let {
+    custom = undefined,
+    localizationLayout = "qwerty",
+    layout = "standard",
+    noSwap = [],
+    keyClass = {},
+    onkeydown = () => {},
+  } = $props();
 
-  // vars
-  let page = 0;
-  let shifted = false;
-  let active = undefined;
+  // state
+  let page = $state(0);
+  let shifted = $state(false);
+  let active = $state(undefined);
 
   const layouts = {
     qwerty: {
@@ -36,7 +37,6 @@
       wordle: azertyWordle,
     },
   };
-  const dispatch = createEventDispatcher();
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
   const swaps = {
     Page0: "abc",
@@ -60,7 +60,7 @@
     } else {
       let output = value;
       if (shifted && alphabet.includes(value)) output = value.toUpperCase();
-      dispatch("keydown", output);
+      onkeydown(output);
     }
     event.stopPropagation();
     return false;
@@ -72,9 +72,9 @@
     }, 50);
   };
 
-  // reactive vars
-  $: rawData = custom || layouts[localizationLayout][layout] || standard;
-  $: data = rawData.map((d) => {
+  // derived
+  let rawData = $derived(custom || layouts[localizationLayout][layout] || qwertyStandard);
+  let data = $derived(rawData.map((d) => {
     let display = d.display;
     const s = swaps[d.value];
     const shouldSwap = s && !noSwap.includes(d.value) && !d.noSwap;
@@ -85,37 +85,34 @@
       ...d,
       display,
     };
-  });
+  }));
 
-  $: page0 = data.filter((d) => !d.page);
-  $: page1 = data.filter((d) => d.page);
+  let page0 = $derived(data.filter((d) => !d.page));
+  let page1 = $derived(data.filter((d) => d.page));
 
-  $: rows0 = unique(page0.map((d) => d.row));
-  $: rows0, rows0.sort((a, b) => a - b);
+  let rows0 = $derived(unique(page0.map((d) => d.row)).sort((a, b) => a - b));
+  let rows1 = $derived(unique(page1.map((d) => d.row)).sort((a, b) => a - b));
 
-  $: rows1 = unique(page1.map((d) => d.row));
-  $: rows1, rows1.sort((a, b) => a - b);
-
-  $: rowData0 = rows0.map((r) => page0.filter((k) => k.row === r));
-  $: rowData1 = rows0.map((r) => page1.filter((k) => k.row === r));
-  $: rowData = [rowData0, rowData1];
+  let rowData0 = $derived(rows0.map((r) => page0.filter((k) => k.row === r)));
+  let rowData1 = $derived(rows1.map((r) => page1.filter((k) => k.row === r)));
+  let rowData = $derived([rowData0, rowData1]);
 </script>
 
 <div class="svelte-keyboard">
   {#each rowData as row, i}
-    <div class="page" class:visible="{i === page}">
+    <div class="page" class:visible={i === page}>
       {#each row as keys}
         <div class="row row--{i}">
           {#each keys as { value, display }}
             <button
               type="button"
               class="key key--{value} {keyClass[value] || ''}"
-              class:single="{value.length === 1}"
-              class:active="{value === active}"
-              on:touchstart="{(e) => onKeyStart(e, value)}"
-              on:mousedown="{(e) => onKeyStart(e, value)}"
-              on:touchend="{() => onKeyEnd(value)}"
-              on:mouseup="{() => onKeyEnd(value)}"
+              class:single={value.length === 1}
+              class:active={value === active}
+              ontouchstart={(e) => onKeyStart(e, value)}
+              onmousedown={(e) => onKeyStart(e, value)}
+              ontouchend={() => onKeyEnd(value)}
+              onmouseup={() => onKeyEnd(value)}
             >
               {#if display.includes("<svg")}
                 {@html display}
