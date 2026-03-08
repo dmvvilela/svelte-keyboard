@@ -4,7 +4,9 @@ A svelte component for when you want a permanent, on-screen keyboard. [View Demo
 
 ## Installation
 
-`npm install svelte-keyboard`
+`pnpm install svelte-keyboard`
+
+**Note:** Requires Svelte 5.
 
 ## Usage
 
@@ -12,12 +14,12 @@ A svelte component for when you want a permanent, on-screen keyboard. [View Demo
 <script>
   import Keyboard from "svelte-keyboard";
 
-  const onKeydown = (event) => {
-    console.log(event.detail);
+  const onkeydown = (key) => {
+    console.log(key);
   }
 </script>
 
-<Keyboard on:keydown="{onKeydown}" />
+<Keyboard {onkeydown} />
 ```
 
 ### Localization Layouts
@@ -39,7 +41,7 @@ A svelte component for when you want a permanent, on-screen keyboard. [View Demo
   const keys = [{ row: 0, value: "Q"}, ...];
 </script>
 
-<Keyboard custom="{keys}" />
+<Keyboard custom={keys} />
 ```
 
 If you want value to be different than the display key, pass a `display` property. If you want keys to be laid out on the second page, include `page: 1` (defaults to `page: 0`) .
@@ -81,7 +83,7 @@ For any other properties, use global CSS on the selector `.svelte-keyboard butto
 
 To give specific keys a class (e.g., "clicked") you can use the `keyClass` prop:
 ```svelte
-<Keyboard keyClass="{{ "x": "clicked"}}" />
+<Keyboard keyClass={{ "x": "clicked"}} />
 ```
 The `keyClass` object is key/value pairs where they key is the key name (e.g., "x" or "Enter") and the value is the class name(s) to apply (e.g., "clicked" or "clicked hide"). You can then use global styling `:global(.key.clicked) { ... }` to apply custom styles.
 
@@ -101,8 +103,10 @@ If you want to say the word instead of an icon, add this prop:
 
 ## Development
 
-change basepath to "" for dev and "svelte-keyboard" for deploy.
+Change basepath to "" for dev and "svelte-keyboard" for deploy.
 
 ```
-npm run dev;
+pnpm run dev
+pnpm run test
+pnpm run build
 ```
